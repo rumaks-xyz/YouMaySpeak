@@ -1,0 +1,7 @@
+{
+	"runtime.version": "LuaJIT",
+	"workspace.library": [
+		"/home/rumaks/software/cod3x"
+	],
+	"runtime.plugin": "/home/rumaks/software/cod3x/omw_context_plugin.lua",
+}

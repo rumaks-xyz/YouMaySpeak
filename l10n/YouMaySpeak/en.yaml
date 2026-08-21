@@ -1,0 +1,7 @@
+settings_page: You May Speak
+settings_page_desc: This mod prevents NPCs from saying their greeting line unless the player is looking at them.
+
+settings_main: Settings
+settings_hello_threshold: Hello threshold
+settings_hello_threshold_desc: |-
+  The maximum Hello AI value at which this mod will be applied. The vast majority of Morrowind NPCs have a Hello value of 30 or lower, though certain merchants and quest givers have a higher value.
