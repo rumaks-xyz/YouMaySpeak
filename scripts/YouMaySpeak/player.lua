@@ -16,7 +16,7 @@ I.SharedRay.subscribe("YouMaySpeak", function(result)
 			return
 		end
 	end
-	if not result.hit then
+	if not (result.hit and object) then
 		return
 	end
 
