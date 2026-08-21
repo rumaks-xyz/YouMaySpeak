@@ -15,10 +15,12 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Create Zip Archive
-        run: zip -r release.zip . -x ".*"
-        shell: bash
+        run: |
+          VERSION=${{ github.ref_name }}
+          zip -r YouMaySpeak-${VERSION}.zip . -x ".*"
+
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: release.zip
+          files: YouMaySpeak-*.zip
