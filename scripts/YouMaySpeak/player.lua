@@ -9,12 +9,11 @@ local lookingAt = nil
 I.SharedRay.subscribe("YouMaySpeak", function(result)
 	local object = result.hitObject
 	if lookingAt then
-		if lookingAt ~= object then
-			lookingAt:sendEvent("YMSApply")
-			lookingAt = nil
-		else
+		if lookingAt == object then
 			return
 		end
+		lookingAt:sendEvent("YMSApply")
+		lookingAt = nil
 	end
 	if not (result.hit and object) then
 		return
