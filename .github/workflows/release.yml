@@ -32,3 +32,4 @@ jobs:
           display_name: "You May Speak"
           version: ${{ github.ref_name }}
           update_mod_version: true
+          primary_mod_manager_download: true
