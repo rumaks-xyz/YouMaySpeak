@@ -1,5 +1,7 @@
 ---@omw-context local
+local async = require("openmw.async")
 local self = require("openmw.self")
+local storage = require("openmw.storage")
 local types = require("openmw.types")
 
 if types.Actor.isDead(self) then
@@ -11,14 +13,16 @@ if not hello then
 	return
 end
 
-local storage = require("openmw.storage")
-local helloThreshold = storage.globalSection("SettingsYouMaySpeak"):get("helloThreshold")
+local settingsSection = storage.globalSection("SettingsYouMaySpeak")
+
+local helloThreshold = settingsSection:get("helloThreshold")
 if hello.base <= 0 or hello.base > helloThreshold then
 	return
 end
 
 local applied = false
 local modifiedBy = 0
+local enabled = settingsSection:get("enabled")
 
 local function unapply()
 	if applied then
@@ -29,6 +33,10 @@ local function unapply()
 end
 
 local function apply()
+	if not enabled then
+		return
+	end
+
 	-- unapply the old modifier in case the hello base changed since it was applied
 	if applied then
 		unapply()
@@ -47,17 +55,43 @@ local function apply()
 	applied = true
 end
 
-apply()
+local function setup()
+	apply()
+
+	settingsSection:subscribe(async:callback(function()
+		enabled = settingsSection:get("enabled")
+		if enabled then
+			apply()
+		else
+			unapply()
+		end
+	end))
+end
 
 return {
 	engineHandlers = {
-		-- this should avoid any permanent effects on the save file
+		onInit = function()
+			-- fix potentially broken NPCs from versions 1.0.0-1.0.2
+			hello.modifier = 0
+
+			setup()
+		end,
+
+		onLoad = function(data)
+			applied = data.applied
+			modifiedBy = data.modifiedBy
+
+			setup()
+		end,
+
 		onInactive = unapply,
+
 		onSave = function()
-			if applied then
-				unapply()
-				self:sendEvent("YMSApply")
-			end
+			return {
+				applied = applied,
+				modifiedBy = modifiedBy,
+				version = 1,
+			}
 		end,
 	},
 	eventHandlers = {
