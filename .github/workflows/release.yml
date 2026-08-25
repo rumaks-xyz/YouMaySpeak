@@ -1,4 +1,4 @@
-name: Create Release
+name: Build and publish release
 
 on:
   push:
@@ -11,13 +11,13 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Create Zip Archive
+      - name: Create zip archive
         run: zip -r YouMaySpeak-${{ github.ref_name }}.zip . -x ".*"
 
-      - name: Create Release
+      - name: Push release
         uses: softprops/action-gh-release@v1
         with:
           files: YouMaySpeak-${{ github.ref_name }}.zip
