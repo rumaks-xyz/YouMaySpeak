@@ -78,8 +78,12 @@ return {
 		end,
 
 		onLoad = function(data)
-			applied = data.applied
-			modifiedBy = data.modifiedBy
+			if data and data.applied and data.modifiedBy then
+				applied = data.applied
+				modifiedBy = data.modifiedBy
+			else
+				hello.modifier = 0
+			end
 
 			setup()
 		end,
