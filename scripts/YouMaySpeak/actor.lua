@@ -70,18 +70,14 @@ end
 
 return {
 	engineHandlers = {
-		onInit = function()
-			-- fix potentially broken NPCs from versions 1.0.0-1.0.2
-			hello.modifier = 0
-
-			setup()
-		end,
+		onInit = setup,
 
 		onLoad = function(data)
 			if data and data.applied and data.modifiedBy then
 				applied = data.applied
 				modifiedBy = data.modifiedBy
 			else
+				-- fix potentially broken NPCs from versions 1.0.0-1.0.2
 				hello.modifier = 0
 			end
 
