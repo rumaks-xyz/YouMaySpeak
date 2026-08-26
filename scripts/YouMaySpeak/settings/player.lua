@@ -1,4 +1,4 @@
----@omw-context menu
+---@omw-context player
 local I = require("openmw.interfaces")
 
 I.Settings.registerPage({

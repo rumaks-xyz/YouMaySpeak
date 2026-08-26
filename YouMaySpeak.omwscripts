@@ -1,4 +1,4 @@
-MENU: scripts/YouMaySpeak/settings/menu.lua
+PLAYER: scripts/YouMaySpeak/settings/player.lua
 GLOBAL: scripts/YouMaySpeak/settings/global.lua
 
 PLAYER: scripts/YouMaySpeak/lib/SharedRay_v2.lua
