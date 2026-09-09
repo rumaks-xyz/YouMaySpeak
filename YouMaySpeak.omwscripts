@@ -3,4 +3,4 @@ GLOBAL: scripts/YouMaySpeak/settings/global.lua
 
 PLAYER: scripts/YouMaySpeak/lib/SharedRay_v2.lua
 PLAYER: scripts/YouMaySpeak/player.lua
-NPC, CREATURE: scripts/YouMaySpeak/actor.lua
+NPC: scripts/YouMaySpeak/actor.lua

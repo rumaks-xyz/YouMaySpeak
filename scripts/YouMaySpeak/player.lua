@@ -1,33 +1,33 @@
+---@omw-context player
 local I = require("openmw.interfaces")
-local core = require("openmw.core")
-local self = require("openmw.self")
 local types = require("openmw.types")
 
-local greetMult = core.getGMST("iGreetDistanceMultiplier")
 local lookingAt = nil
 
 I.SharedRay.subscribe("YouMaySpeak", function(result)
 	local object = result.hitObject
+
 	if lookingAt then
 		if lookingAt == object then
 			return
 		end
-		lookingAt:sendEvent("YMSApply")
+		lookingAt:sendEvent("YMSMute")
 		lookingAt = nil
 	end
-	if not (result.hit and object) then
-		return
-	end
 
-	if object.type ~= types.NPC and object.type ~= types.Creature then
-		return
-	end
+	if
+		result.hit
+		and object
+		and types.NPC.objectIsInstance(object)
+		and types.NPC.stats.ai.hello(object).base > 0
+	then
+		object:sendEvent("YMSUnmute")
+		lookingAt = object
 
-	-- for better 3rd person compatibility, distance is calculated from the player, not from the camera.
-	if (object.position - self.position):length() > greetMult * types.Actor.stats.ai.hello(object).base then
-		return
+		print(
+			object.recordId,
+			types.NPC.stats.ai.hello(object).base,
+			types.NPC.stats.ai.hello(object).modifier
+		)
 	end
-
-	object:sendEvent("YMSUnapply")
-	lookingAt = object
 end)

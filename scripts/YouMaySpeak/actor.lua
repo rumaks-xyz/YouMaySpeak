@@ -14,88 +14,79 @@ if not hello then
 end
 
 local settingsSection = storage.globalSection("SettingsYouMaySpeak")
+local settings = settingsSection:asTable()
 
-local helloThreshold = settingsSection:get("helloThreshold")
-if hello.base <= 0 or hello.base > helloThreshold then
-	return
-end
-
-local applied = false
+local muted = false
 local modifiedBy = 0
-local enabled = settingsSection:get("enabled")
 
-local function unapply()
-	if applied then
+local function unmute()
+	if muted then
 		hello.modifier = hello.modifier - modifiedBy
 		modifiedBy = 0
-		applied = false
+		muted = false
 	end
 end
 
-local function apply()
-	if not enabled then
+local function mute()
+	if not settings.enabled then
 		return
 	end
 
-	-- unapply the old modifier in case the hello base changed since it was applied
-	if applied then
-		unapply()
-	end
+	unmute()
 
-	-- for better compatibility with any mods that might be changing hello.base to 0
-	-- (such as Unofficial Tamriel Rebuilt Spells)
-	if hello.base <= 0 then
+	if hello.base <= 0 or hello.base > settings.helloThreshold then
 		return
 	end
 
-	-- at 0 hello value, NPCs won't say idle dialogue, therefore we'll set it to 1.
+	-- at 0 hello value, NPCs won't say idle dialogue, so we'll set it to 1.
 	modifiedBy = -hello.base + 1
 	hello.modifier = hello.modifier + modifiedBy
 
-	applied = true
+	muted = true
 end
 
-local function setup()
-	apply()
-
-	settingsSection:subscribe(async:callback(function()
-		enabled = settingsSection:get("enabled")
-		if enabled then
-			apply()
-		else
-			unapply()
-		end
-	end))
-end
+settingsSection:subscribe(async:callback(function()
+	settings = settingsSection:asTable()
+	if settings.enabled and hello.base <= settings.helloThreshold then
+		mute()
+	else
+		unmute()
+	end
+end))
 
 return {
 	engineHandlers = {
-		onInit = setup,
+		onInit = mute,
 
 		onLoad = function(data)
-			if data and data.applied and data.modifiedBy then
-				applied = data.applied
+			if data then
+				if data.version == 1 then
+					-- `muted` used to be named `applied` prior to YMS 1.2.0
+					data.muted = data.applied
+				end
+
+				muted = data.muted
 				modifiedBy = data.modifiedBy
 			else
 				-- fix potentially broken NPCs from versions 1.0.0-1.0.2
 				hello.modifier = 0
 			end
 
-			setup()
+			mute()
 		end,
 
-		onInactive = unapply,
+		onInactive = unmute,
 
 		onSave = function()
 			return {
-				applied = applied,
+				muted = muted,
 				modifiedBy = modifiedBy,
-				version = 1,
+				version = 2,
 			}
 		end,
 	},
 	eventHandlers = {
-		YMSApply = apply,
-		YMSUnapply = unapply,
+		YMSMute = mute,
+		YMSUnmute = unmute,
 	},
 }
